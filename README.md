@@ -10,7 +10,7 @@ OData клиент для 1C
 [Composer](http://getcomposer.org):
 
 ```
-$ composer require kilylabs/odata-1c
+$ composer require mihpa/odata-1c
 ```
 
 Использование
@@ -19,7 +19,7 @@ $ composer require kilylabs/odata-1c
 ```php
 <?php
 
-use Kily\Tools1C\OData\Client;
+use Tools1C\OData\Client;
 
 require __DIR__.'/vendor/autoload.php';
 
@@ -65,10 +65,6 @@ $data = $client->{'Catalog_Номенклатура'}->id("40366f94-cded-11e6-e8
 // Получение по фильтру
 $data = $client->{'Catalog_Номенклатура'}->get("Артикул eq 'АРТ-1'")->values();
 $data = $client->{'Catalog_Номенклатура'}->filter("Артикул eq 'АРТ-1'")->get()->values();
-
-// Получение вместе с дополнительной информацией
-$data = $client->{'Catalog_Номенклатура'}->expand('Производитель,Марка')->get()->values();
-$data = $client->{'Catalog_Номенклатура'}->expand('ВидНоменклатуры')->get()->values();
 
 // Ограничение по количеству в запросе
 $data = $client->{'Catalog_Номенклатура'}->top(10)->get()->values();
@@ -117,8 +113,3 @@ $data = $client->{'Document_АктВыполненныхРабот'}->id("40366f
 // Отмена проведения документа
 $data = $client->{'Document_АктВыполненныхРабот'}->id("40366f94-cded-11e6-e880-00155dd9fc47")->unpost();
 ```
-TODO
------
-- ~~сделать метод getLastId();~~
-- ~~fluent интерфейс~~
-- поддержка XML?

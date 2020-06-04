@@ -36,18 +36,17 @@ class Client implements \ArrayAccess
         ],$options));
     }
 
-    public function id($id=null) {
-        if($id === null) return $this->getLastId();
+    public function id($id) {
         $this->id = $id;
         return $this;
     }
 
     public function create(array $data,$options=[]) {
-        return $this->update(false,$data,$options);
+        return $this->update(null,$data,$options);
     }
 
-    public function expand($name) {
-        $this->request_options['query']['$expand'] = $name;
+    public function select($names) {
+        $this->request_options['query']['$select'] = trim(implode(',', $names));
         return $this;
     }
 
@@ -61,26 +60,26 @@ class Client implements \ArrayAccess
         return $this;
     }
 
+    public function format($name) {
+        $this->request_options['query']['$format'] = $name;
+        return $this;
+    }
+
+    public function orderby($name, $direction) {
+        $this->request_options['query']['$orderby'] = sprintf('%s %s', $name, $direction);
+        return $this;
+    }
+
     public function get($id=null,$filter=null,$options=[]) {
-        $query = null;
-        if($id === null) {
-            $id = $this->id;
-        } elseif(is_array($id)) {
-            $query = [];
-            foreach($id as $k=>$v) {
-                if(preg_match('/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i',$v)) {
-                    $v = "guid'{$v}'";
-                }
-                $query[] = $k.'='.$v;
-            }
-            $query = '('.implode(',',$query).')';
-        } elseif(!preg_match('/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i',$id)) {
+        if($id === null) $id = $this->id;
+        elseif(!preg_match('/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i',$id)) {
             $options = $filter;
             $filter = $id;
             $id = null;
         }
 
-        if($id && !is_array($id)) {
+        $query = null;
+        if($id) {
             $query .= "(guid'{$id}')";
         }
         if($filter) {
@@ -98,7 +97,6 @@ class Client implements \ArrayAccess
             $options = $data;
             $data = $id;
             $id = $this->id;
-            if(!$this->id) $id = $this->getLastId();
         }
 
         $method = 'PATCH';
@@ -117,30 +115,12 @@ class Client implements \ArrayAccess
     }
 
     public function delete($id=null,$options=[]) {
+        if($id === null) $id = $this->id;
         $query = null;
-
-        if($id === null) {
-            $id = $this->id;
-        } elseif(is_array($id)) {
-            $query = [];
-            foreach($id as $k=>$v) {
-                if(preg_match('/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i',$v)) {
-                    $v = "guid'{$v}'";
-                }
-                $query[] = $k.'='.$v;
-            }
-            $query = '('.implode(',',$query).')';
-        }
-
-        if($id && !is_array($id)) {
+        if($id) {
             $query .= "(guid'{$id}')";
         }
-        if($filter) {
-            $this->filter($filter);
-        }
-        if($query)
-            $this->requested[] = $query;
-
+        $this->requested[] = $query;
         return $this->request('DELETE',$options);
     }
 
@@ -233,9 +213,7 @@ class Client implements \ArrayAccess
     }
 
     public function getLastId() {
-        return !empty($this->_metadata['last_id'])
-            ? $this->_metadata['last_id']
-            : isset($this->response->values()[0]['Ref_Key']) ? $this->response->values()[0]['Ref_Key'] : null;
+        return !empty($this->_metadata['last_id']) ? $this->_metadata['last_id'] : null;
     }
 
     protected function parseMetadata(ResponseInterface $resp) {
@@ -256,8 +234,7 @@ class Client implements \ArrayAccess
         }
     }
 
-    public function getMetadata($name=null) {
-        if($name === null) return $this->_metadata;
+    public function getMetadata($name) {
         return isset($this->_metadata[$name]) ? $this->_metadata[$name] : null;
     }
 
