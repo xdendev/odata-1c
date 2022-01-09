@@ -1,5 +1,5 @@
 {
-    "name": "xdendev/odata-1c",
+    "name": "mihpa/odata-1c",
     "description": "ODATA protocol client adopted to use with 1C",
     "keywords": ["1c", "1с", "odata", "1c enterprise", "8.3", "1с enterprise 8.3"],
     "type": "library",
@@ -12,8 +12,8 @@
 	},
     "authors": [
         {
-            "name": "Denis X",
-            "email": "me@xden.dev"
+            "name": "Pavel Mikhailiuk",
+            "email": "mihpa4@gmail.com"
         }
     ],
     "require": {
