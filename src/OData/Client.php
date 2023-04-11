@@ -50,6 +50,11 @@ class Client implements \ArrayAccess
         return $this;
     }
 
+    public function expand($names) {
+        $this->request_options['query']['$expand'] = trim(implode('/', $names));
+        return $this;
+    }
+
     public function top($cnt) {
         $this->request_options['query']['$top'] = $cnt;
         return $this;
