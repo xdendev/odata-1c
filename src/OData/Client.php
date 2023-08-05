@@ -51,7 +51,7 @@ class Client implements \ArrayAccess
     }
 
     public function expand($names) {
-        $this->request_options['query']['$expand'] = trim(implode('/', $names));
+        $this->request_options['query']['$expand'] = trim(implode(',', $names));
         return $this;
     }
 
