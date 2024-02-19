@@ -12,7 +12,7 @@ class Response
     private $arr;
 
     public function __construct(Client $clnt, ResponseInterface $resp) {
-        $this->client = $clnt;
+        $this->clnt = $clnt;
         $this->response = $resp;
     }
 
